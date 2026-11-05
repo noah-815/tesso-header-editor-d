@@ -2593,8 +2593,9 @@ function createDesktop() {
     const drawn = drawerDesk() || ['04', '10'].includes(state.desk) ? false : local.open || local.search || local.leaving;
     // Set 14 over the media: header and sheet are one piece, also while it closes (400ms)
     hdr.classList.toggle('is-sheet', state.desk === '14' && overlaps() && !local.solid && (local.open || local.search || local.leaving));
-    // Set 04 · 10 · 11 – 14 keep their 미디어 위 colours while hovered and after scrolling
-    const hovered = local.hover && !KEEP_MEDIA.includes(state.desk);
+    // Set 04 · 10 · 11 – 14 keep their 미디어 위 colours while hovered and after scrolling;
+    // Set 05 / 06 keeps them while hovered at the top, and changes once scrolled
+    const hovered = local.hover && !KEEP_MEDIA.includes(state.desk) && state.desk !== '05';
     const scrolled = local.scrolled && !KEEP_MEDIA.includes(state.desk);
     hdr.classList.toggle('on-media', overlaps() && !scrolled && !hovered && !local.solid && !drawn);
     p.paintSearch(local.caret);
