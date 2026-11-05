@@ -600,7 +600,7 @@
   /* search field — shared by desktop and mobile */
   .sf {
     display: flex; align-items: center; gap: 8px; padding: 13px 0 14px;
-    border-bottom: 1px solid var(--header-search-border-inactive); /* no colour transition: an edited 검색창 구분선 shows at once */
+    border-bottom: var(--hair, 1px) solid var(--header-search-border-inactive); /* no colour transition: an edited 검색창 구분선 shows at once */
   }
   .sf.is-active { border-bottom-color: var(--header-search-border-active); }
   .sf-icon { flex: none; width: 16px; height: 16px; color: var(--header-search-icon); }
@@ -2509,6 +2509,8 @@ function basePane(node, width, height) {
     viewport.style.height = (height || frame.clientHeight / scale) + 'px';
     viewport.dataset.scale = scale;
     viewport.style.transform = `scale(${scale})`;
+    // a 1px line shrunk below one screen pixel can drop out entirely (non-retina screens): keep it at least 1 device pixel
+    viewport.style.setProperty('--hair', Math.max(1, Math.ceil(1 / (scale * devicePixelRatio)))  /* borders snap down to whole pixels */ + 'px');
   }).observe(frame);
   // Set 10's search panel starts under the first menu chip: keep its x (in unscaled px) on the header
   const dnav = node.querySelector('.d-nav');
