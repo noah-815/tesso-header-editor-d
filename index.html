@@ -600,7 +600,7 @@
   /* search field — shared by desktop and mobile */
   .sf {
     display: flex; align-items: center; gap: 8px; padding: 13px 0 14px;
-    border-bottom: 1px solid var(--header-search-border-inactive); transition: border-color .2s ease;
+    border-bottom: 1px solid var(--header-search-border-inactive); /* no colour transition: an edited 검색창 구분선 shows at once */
   }
   .sf.is-active { border-bottom-color: var(--header-search-border-active); }
   .sf-icon { flex: none; width: 16px; height: 16px; color: var(--header-search-icon); }
