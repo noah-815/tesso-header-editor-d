@@ -1548,7 +1548,7 @@
   .mg-2s { position: relative; flex: 1; min-width: 0; }
   .mg-2 { position: absolute; left: 0; top: var(--top, 0px); padding-top: 4px; opacity: 0; visibility: hidden; transition: opacity .25s var(--ease-in), visibility 0s linear .25s; }
   .mg-2.is-on { opacity: 1; visibility: visible; transition: opacity .3s var(--ease-out), visibility 0s; }
-  .mg-2.is-swap { transition: none; }
+  .mg-2.is-on.is-after { transition: opacity .3s var(--ease-out) .25s, visibility 0s linear .25s; }
   .mg-2 a { font: 400 44px/61px Inter, sans-serif; cursor: pointer; }
   .mg-1:hover a:not(:hover), .d-mega.is-sub .mg-1 a:not(.is-cur) { color: color-mix(in srgb, var(--header-menu-nav) 20%, transparent); }
   .frame:not(.m)[data-desk="14"] .d-search {
@@ -2577,10 +2577,12 @@ function createDesktop() {
     hdr.querySelector('.dw-big').dataset.depth = local.dwDepth;
     hdr.querySelector('.d-mega').classList.toggle('is-sub', !!local.sub);
     hdr.querySelectorAll('.mg-1 > a').forEach(a => a.classList.toggle('is-cur', !!local.sub && a.dataset.mg === local.sub));
+    const shownSub = hdr.querySelector('.mg-2.is-on')?.dataset.for;
     hdr.querySelectorAll('.mg-2').forEach(n => {
       const on = n.dataset.for === local.sub;
-      // moving from one depth 2 list to another: the old one goes at once, so the two never sit on top of each other
-      n.classList.toggle('is-swap', !on && !!local.sub && n.classList.contains('is-on'));
+      // moving from one depth 2 list to another: the old one fades out first (250ms), then the new one fades in,
+      // so the two never sit on top of each other
+      if (on && !n.classList.contains('is-on')) n.classList.toggle('is-after', !!shownSub && shownSub !== n.dataset.for);
       n.classList.toggle('is-on', on);
       if (on) { const it = hdr.querySelector(`.mg-1 > [data-mg="${local.sub}"]`); n.style.setProperty('--top', (it.offsetTop - it.parentNode.offsetTop) + 'px'); } // level with the hovered item
     });
