@@ -1954,6 +1954,8 @@ const PAIRS = {
 // P · R · S full panels like F (data-mset keeps the real letter for what differs)
 const PAIR_LOOK = { G: 'F', O: 'I', P: 'F', Q: 'I', R: 'F', S: 'F' };
 const DRAWER_DESKS = ['11', '12', '13'];
+// headers that stay in their 헤더 겹침 colours when hovered or scrolled over the media
+const KEEP_MEDIA = ['04', '10', '11', '12', '13', '14'];
 // where each item applies, per pairing ('01A', '05I', …): 'both' PC·모바일 · 'pc' · 'm' 모바일 · missing: not shown
 // Set 08 + L and Set 09 + M have one pairing each: on(s01, s05, '08L' value, '09M' value, Set 11 { G, I })
 const on = (s01 = {}, s05 = {}, l, m, s11 = {}) => Object.fromEntries([
@@ -2534,10 +2536,9 @@ function createDesktop() {
     frame.classList.toggle('is-dimmed', (local.open && !local.search && !['02', '03', '10'].includes(state.desk)) || (local.search && !['01', '02'].includes(state.desk)));
     // Set 11 · 12 · 13's drawers open over the header, which stays as it was under the dim
     const drawn = drawerDesk() || ['04', '10'].includes(state.desk) ? false : local.open || local.search;
-    // and they keep their 미디어 위 colours while hovered
-    const hovered = local.hover && !drawerDesk() && !['04', '10'].includes(state.desk);
-    // Set 04 · 10 keep their 미디어 위 colours after scrolling
-    const scrolled = local.scrolled && !['04', '10'].includes(state.desk);
+    // Set 04 · 10 · 11 – 14 keep their 미디어 위 colours while hovered and after scrolling
+    const hovered = local.hover && !KEEP_MEDIA.includes(state.desk);
+    const scrolled = local.scrolled && !KEEP_MEDIA.includes(state.desk);
     hdr.classList.toggle('on-media', overlaps() && !scrolled && !hovered && !local.solid && !drawn);
     p.paintSearch(local.caret);
   }
@@ -2614,7 +2615,7 @@ function createMobile() {
     hdr.classList.toggle('is-menu', local.menu);
     // I's drawer leaves the header bar as it was, under the dim
     const covered = local.menu && !['E', 'N'].includes(state.set) && (local.search || state.set !== 'I');
-    const scrolled = local.scrolled && !['04', '10'].includes(state.desk); // Set 04 · 10 keep their 미디어 위 colours after scrolling
+    const scrolled = local.scrolled && !KEEP_MEDIA.includes(state.desk); // Set 04 · 10 · 11 – 14 keep their 미디어 위 colours after scrolling
     hdr.classList.toggle('on-media', overlaps() && !scrolled && !local.solid && !covered);
     hdr.classList.toggle('is-search', local.menu && local.search);
     panel.classList.toggle('is-search-mode', local.search && state.set !== 'A'); // A searches inside the menu panel
