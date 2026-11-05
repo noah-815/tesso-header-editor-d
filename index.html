@@ -1209,6 +1209,8 @@
   .frame:not(.m)[data-desk="09"] .sf input, .frame:not(.m)[data-desk="09"] .sf-mirror { font: 600 20px/1.2 Inter, Pretendard, sans-serif; }
   .frame:not(.m)[data-desk="09"] .sf-mirror i { height: 20px; }
   .frame[data-desk="09"]:not(.is-overlap) .hdr { margin-bottom: var(--float); } /* sub pages: a gap under the card */
+  /* inset card: the open menu · search panel tucks 1px under the bar, so scaled previews show no hairline seam between them */
+  .frame:not(.m):is([data-desk="08"], [data-desk="09"]) :is(.dd, .d-search) { margin-top: -1px; border-top: 1px solid transparent; }
   .frame:not(.m)[data-desk="09"] .d-search .res { margin-top: 32px; }
   .frame:not(.m)[data-desk="09"] .d-list { font-size: 14px; }
   .frame:not(.m)[data-desk="09"] .d-list li { padding: 8px 0; }
