@@ -610,6 +610,7 @@
     font: 400 13px/1.2 Inter, Pretendard, sans-serif; color: var(--header-search-input-text); caret-color: var(--header-search-cursor);
   }
   .sf input::placeholder { color: var(--header-search-placeholder-text); }
+  .frame[data-desk="02"] .sf input::placeholder { color: transparent; } /* Set 02 · C: the search field has no placeholder */
   /* while a search colour is being edited the field isn't focused, so its cursor is drawn */
   .sf-mirror { position: absolute; inset: 0; display: none; align-items: center; pointer-events: none; font: 400 13px/1.2 Inter, Pretendard, sans-serif; }
   .sf-mirror b { visibility: hidden; font-weight: 400; white-space: pre; }
