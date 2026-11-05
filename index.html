@@ -1528,13 +1528,13 @@
   .frame:not(.m)[data-desk="14"] .d-close .x-ico { display: block; }
   /* Set 14 motion: the menu and the search reveal top → down (clip-path 800ms ease-in-out) and close the reverse way (400ms ease-in) */
   .frame:not(.m)[data-desk="14"] .d-mega {
-    position: absolute; left: 0; right: 0; top: 100%; z-index: 2; height: calc(1080px - var(--hdr-h));
-    display: flex; padding: 20px 37px; background: var(--header-background); color: var(--header-menu-nav);
-    box-shadow: 0 -1px 0 var(--header-background); /* covers the bar seam, like the other panels */
+    /* one sheet with the header: it starts at the top of the bar (behind its items) and fills the screen */
+    position: absolute; left: 0; right: 0; top: 0; z-index: 2; height: 1080px;
+    display: flex; padding: calc(var(--hdr-h) + 20px) 37px 20px; background: var(--header-background); color: var(--header-menu-nav);
     clip-path: inset(0 0 100% 0); visibility: hidden;
     transition: clip-path .4s var(--ease-in), visibility 0s linear .4s, background-color .25s ease;
   }
-  .frame:not(.m)[data-desk="14"] .hdr.is-open .d-mega { clip-path: inset(-1px 0 0 0); visibility: visible; transition: clip-path .8s var(--ease-in-out), visibility 0s, background-color .25s ease; }
+  .frame:not(.m)[data-desk="14"] .hdr.is-open .d-mega { clip-path: inset(0); visibility: visible; transition: clip-path .8s var(--ease-in-out), visibility 0s, background-color .25s ease; }
   .mg-1, .mg-2 { display: flex; flex-direction: column; align-items: flex-start; }
   .mg-1 { width: 555px; flex: none; }
   /* depth 1: stagger in (translateY 10px → 0 + opacity · 600ms · 100ms apart); reset once the panel has closed */
@@ -1551,13 +1551,17 @@
   .mg-2 a { font: 400 44px/61px Inter, sans-serif; cursor: pointer; }
   .mg-1:hover a:not(:hover), .d-mega.is-sub .mg-1 a:not(.is-cur) { color: color-mix(in srgb, var(--header-menu-nav) 20%, transparent); }
   .frame:not(.m)[data-desk="14"] .d-search {
-    padding-top: 32px; opacity: 1; clip-path: inset(0 0 100% 0); visibility: hidden;
+    top: 0; height: 1080px; padding-top: calc(var(--hdr-h) + 32px); box-shadow: none;
+    opacity: 1; clip-path: inset(0 0 100% 0); visibility: hidden;
     transition: clip-path .4s var(--ease-in), visibility 0s linear .4s, background-color .25s ease;
   }
-  .frame:not(.m)[data-desk="14"] .hdr.is-search .d-search { clip-path: inset(-1px 0 0 0); visibility: visible; transition: clip-path .8s var(--ease-in-out), visibility 0s, background-color .25s ease; }
+  .frame:not(.m)[data-desk="14"] .hdr.is-search .d-search { clip-path: inset(0); visibility: visible; transition: clip-path .8s var(--ease-in-out), visibility 0s, background-color .25s ease; }
   /* results fade in once something is typed (they hide again when it's cleared) */
   .frame:not(.m)[data-desk="14"] .d-search:not(.is-empty) .res { animation: s14-fade .3s var(--ease-out); }
   @keyframes s14-fade { from { opacity: 0; } }
+  /* over the media the bar has no background of its own while the sheet is out: the sheet's reveal paints it,
+     so the header and the menu (or search) come and go as one piece; its items turn dark just as the sheet reaches them */
+  .frame:not(.m)[data-desk="14"] .hdr.is-sheet .hdr-bar { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; transition: color .25s ease .1s; }
   /* while search is open the menu takes no hover */
   .frame:not(.m)[data-desk="14"] .hdr.is-search :is(.d-mega, .d-mtxt) { pointer-events: none; }
   /* a preview state picked from the toolbar (or auto-shown while editing) lands without playing the motion */
@@ -2550,12 +2554,19 @@ function createDesktop() {
   const { frame, scroller, hdr, page, input } = p;
   // solid: a header colour is being edited, so an overlapping header shows its hover / scroll look
   // dwDepth: Set 13's drawer list (1 · 2) · sub: Set 14's 2depth column
-  const local = { open: false, search: false, forced: false, caret: false, scrolled: false, hover: false, solid: false, dwDepth: 1, sub: false };
+  const local = { open: false, search: false, forced: false, caret: false, scrolled: false, hover: false, solid: false, dwDepth: 1, sub: false, leaving: false };
+  let leaveTimer = 0;
   const shop = hdr.querySelector('[data-dd]');
   const drawerDesk = () => DRAWER_DESKS.includes(state.desk);
   // Set 11 – 14 open their menu with a click, so leaving the header or hovering an icon doesn't close it
   const clickMenu = () => drawerDesk() || state.desk === '14';
 
+  // Set 14: keep the header in its open look until the sheet has closed
+  function leave(wasOut) {
+    clearTimeout(leaveTimer);
+    local.leaving = state.desk === '14' && wasOut && !local.open && !local.search;
+    if (local.leaving) leaveTimer = setTimeout(() => { local.leaving = false; render(); }, 400);
+  }
   function render() {
     p.paint();
     hdr.classList.toggle('is-open', local.open && !local.search);
@@ -2573,7 +2584,9 @@ function createDesktop() {
     // Set 05 / 06 also dims the page under its search panel
     frame.classList.toggle('is-dimmed', (local.open && !local.search && !['02', '03', '10'].includes(state.desk)) || (local.search && !['01', '02'].includes(state.desk)));
     // Set 11 · 12 · 13's drawers open over the header, which stays as it was under the dim
-    const drawn = drawerDesk() || ['04', '10'].includes(state.desk) ? false : local.open || local.search;
+    const drawn = drawerDesk() || ['04', '10'].includes(state.desk) ? false : local.open || local.search || local.leaving;
+    // Set 14 over the media: header and sheet are one piece, also while it closes (400ms)
+    hdr.classList.toggle('is-sheet', state.desk === '14' && overlaps() && !local.solid && (local.open || local.search || local.leaving));
     // Set 04 · 10 · 11 – 14 keep their 미디어 위 colours while hovered and after scrolling
     const hovered = local.hover && !KEEP_MEDIA.includes(state.desk);
     const scrolled = local.scrolled && !KEEP_MEDIA.includes(state.desk);
@@ -2593,7 +2606,7 @@ function createDesktop() {
     el.addEventListener('mouseenter', () => { if (!local.forced && local.open && !clickMenu()) { local.open = false; render(); } }));
   hdr.addEventListener('mouseleave', () => { local.hover = false; if (!local.forced && local.open && !clickMenu()) local.open = false; render(); });
   // Set 11 · 12 · 13: the hamburger opens a drawer; its X or the dim closes it, and the drawer's accordion toggles
-  const openMenu = open => { Object.assign(local, { open, search: false, dwDepth: 1, sub: false }); input.value = ''; render(); };
+  const openMenu = open => { const was = local.open || local.search; Object.assign(local, { open, search: false, dwDepth: 1, sub: false }); input.value = ''; leave(was); render(); };
   hdr.querySelector('[data-open]').addEventListener('click', () => openMenu(true));
   hdr.querySelectorAll('[data-dclose]').forEach(b => b.addEventListener('click', () => { local.open = false; setSearch(false); }));
   hdr.querySelectorAll('[data-dw-toggle]').forEach(b => b.addEventListener('click', () => b.closest('.acc').classList.toggle('is-open')));
@@ -2609,7 +2622,9 @@ function createDesktop() {
   }));
 
   function setSearch(open) {
+    const was = local.open || local.search;
     local.search = open; local.open = false; local.caret = false;
+    leave(was);
     if (open) setTimeout(() => input.focus({ preventScroll: true }), 50);
     else input.value = '';
     render();
@@ -2630,7 +2645,7 @@ function createDesktop() {
     node, render,
     setPage() { page.innerHTML = pageHTML(state.page); scroller.scrollTop = 0; render(); },
     setView(view, opts = {}) {
-      Object.assign(local, { open: false, search: false, forced: view === 'menu' || view === 'search', caret: false, solid: !!opts.solid,
+      clearTimeout(leaveTimer); Object.assign(local, { open: false, search: false, leaving: false, forced: view === 'menu' || view === 'search', caret: false, solid: !!opts.solid,
         dwDepth: view === 'menu' && opts.depth2 ? 2 : 1, sub: false });
       scroller.scrollTop = view === 'scroll' ? SCROLL_Y : peekY(view, opts);
       local.scrolled = scroller.scrollTop > 0;
