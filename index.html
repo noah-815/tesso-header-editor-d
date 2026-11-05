@@ -2649,6 +2649,11 @@ function createDesktop() {
     const scrolled = scroller.scrollTop > 0;
     if (scrolled !== local.scrolled) { local.scrolled = scrolled; render(); }
   }, { passive: true });
+  // editing a header colour shows the plain header look; scrolling or clicking the preview goes back to the live look
+  // (so at the top an overlapping header shows its 헤더 겹침 colours again)
+  const releaseSolid = () => { if (local.solid) { local.solid = false; render(); } };
+  ['wheel', 'touchstart'].forEach(t => scroller.addEventListener(t, releaseSolid, { passive: true }));
+  frame.addEventListener('pointerdown', releaseSolid, true);
 
   return {
     node, render,
@@ -2712,6 +2717,11 @@ function createMobile() {
     const scrolled = scroller.scrollTop > 0;
     if (scrolled !== local.scrolled) { local.scrolled = scrolled; render(); }
   }, { passive: true });
+  // editing a header colour shows the plain header look; scrolling or clicking the preview goes back to the live look
+  // (so at the top an overlapping header shows its 헤더 겹침 colours again)
+  const releaseSolid = () => { if (local.solid) { local.solid = false; render(); } };
+  ['wheel', 'touchstart'].forEach(t => scroller.addEventListener(t, releaseSolid, { passive: true }));
+  frame.addEventListener('pointerdown', releaseSolid, true);
 
   return {
     node, render,
