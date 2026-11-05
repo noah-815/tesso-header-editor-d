@@ -10,6 +10,7 @@
 <style>
   /* ── Editor chrome ─────────────────────────────── */
   :root {
+    --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1); --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); --ease-in: cubic-bezier(0.4, 0, 1, 1); --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
     --ui-bg: #f3f3f4;
     --ui-panel: #ffffff;
     --ui-line: #e4e4e7;
@@ -1513,8 +1514,11 @@
   .frame:not(.m)[data-desk="14"] .d-mtxt { display: flex; margin-left: -8px; }
   .d-mtxt > span { display: flex; align-items: center; gap: 4px; }
   .d-mtxt svg, .d-close .x-ico { flex: none; width: 16px; height: 16px; }
-  .d-mtxt .mt-close, .hdr.is-open .d-mtxt .mt-open { display: none; }
-  .hdr.is-open .d-mtxt .mt-close { display: flex; }
+  /* MENU ↔ CLOSE: both labels sit in one cell and crossfade */
+  .frame:not(.m)[data-desk="14"] .d-mtxt { display: grid; }
+  .d-mtxt > span { grid-area: 1 / 1; transition: opacity .25s var(--ease-in-out); }
+  .d-mtxt .mt-close, .hdr.is-open .d-mtxt .mt-open { opacity: 0; pointer-events: none; }
+  .hdr.is-open .d-mtxt .mt-close { opacity: 1; }
   .frame:not(.m)[data-desk="14"] .d-util { margin-left: auto; gap: 10px; }
   .frame:not(.m)[data-desk="14"] .d-util > :is(.d-txt[data-search], .d-ico:not([data-search])) { display: none; }
   .frame:not(.m)[data-desk="14"] .d-util > .d-ico[data-search] { display: flex; order: -1; }
@@ -1522,20 +1526,45 @@
   .frame:not(.m)[data-desk="14"] .hdr.is-search :is(.d-mtxt, .hdr-logo) { display: none; }
   .frame:not(.m)[data-desk="14"] .hdr.is-search .d-close { margin-left: auto; gap: 4px; }
   .frame:not(.m)[data-desk="14"] .d-close .x-ico { display: block; }
+  /* Set 14 motion: the menu and the search reveal top → down (clip-path 800ms ease-in-out) and close the reverse way (400ms ease-in) */
   .frame:not(.m)[data-desk="14"] .d-mega {
     position: absolute; left: 0; right: 0; top: 100%; z-index: 2; height: calc(1080px - var(--hdr-h));
     display: flex; padding: 20px 37px; background: var(--header-background); color: var(--header-menu-nav);
-    opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility 0s linear .2s, background-color .25s ease;
+    box-shadow: 0 -1px 0 var(--header-background); /* covers the bar seam, like the other panels */
+    clip-path: inset(0 0 100% 0); visibility: hidden;
+    transition: clip-path .4s var(--ease-in), visibility 0s linear .4s, background-color .25s ease;
   }
-  .frame:not(.m)[data-desk="14"] .hdr.is-open .d-mega { opacity: 1; visibility: visible; transition: opacity .2s ease, visibility 0s, background-color .25s ease; }
+  .frame:not(.m)[data-desk="14"] .hdr.is-open .d-mega { clip-path: inset(-1px 0 0 0); visibility: visible; transition: clip-path .8s var(--ease-in-out), visibility 0s, background-color .25s ease; }
   .mg-1, .mg-2 { display: flex; flex-direction: column; align-items: flex-start; }
   .mg-1 { width: 555px; flex: none; }
-  .mg-1 a { font: 600 76px/92px Inter, sans-serif; letter-spacing: -1px; cursor: pointer; transition: color .2s ease; }
-  .mg-2 { visibility: hidden; padding-top: 4px; }
-  .d-mega.is-sub .mg-2 { visibility: visible; }
+  /* depth 1: stagger in (translateY 10px → 0 + opacity · 600ms · 100ms apart); reset once the panel has closed */
+  .mg-1 a {
+    font: 600 76px/92px Inter, sans-serif; letter-spacing: -1px; cursor: pointer;
+    opacity: 0; transform: translateY(10px); transition: color .2s ease, opacity 0s linear .4s, transform 0s linear .4s;
+  }
+  .hdr.is-open .mg-1 a { opacity: 1; transform: none; transition: color .2s ease, opacity .6s var(--ease-in-out) var(--d, 0s), transform .6s var(--ease-in-out) var(--d, 0s); }
+  .mg-1 a:nth-child(2) { --d: .1s; } .mg-1 a:nth-child(3) { --d: .2s; } .mg-1 a:nth-child(4) { --d: .3s; } .mg-1 a:nth-child(5) { --d: .4s; }
+  /* depth 2: next to the hovered item (Shop · About), fades in 300ms ease-out, out 250ms */
+  .mg-2s { position: relative; flex: 1; min-width: 0; }
+  .mg-2 { position: absolute; left: 0; top: var(--top, 0px); padding-top: 4px; opacity: 0; visibility: hidden; transition: opacity .25s var(--ease-in), visibility 0s linear .25s; }
+  .mg-2.is-on { opacity: 1; visibility: visible; transition: opacity .3s var(--ease-out), visibility 0s; }
   .mg-2 a { font: 400 44px/61px Inter, sans-serif; cursor: pointer; }
-  .mg-1:hover a:not(:hover), .d-mega.is-sub .mg-1 a:not([data-mg]) { color: color-mix(in srgb, var(--header-menu-nav) 20%, transparent); }
-  .frame:not(.m)[data-desk="14"] .d-search { padding-top: 32px; }
+  .mg-1:hover a:not(:hover), .d-mega.is-sub .mg-1 a:not(.is-cur) { color: color-mix(in srgb, var(--header-menu-nav) 20%, transparent); }
+  .frame:not(.m)[data-desk="14"] .d-search {
+    padding-top: 32px; opacity: 1; clip-path: inset(0 0 100% 0); visibility: hidden;
+    transition: clip-path .4s var(--ease-in), visibility 0s linear .4s, background-color .25s ease;
+  }
+  .frame:not(.m)[data-desk="14"] .hdr.is-search .d-search { clip-path: inset(-1px 0 0 0); visibility: visible; transition: clip-path .8s var(--ease-in-out), visibility 0s, background-color .25s ease; }
+  /* results fade in once something is typed (they hide again when it's cleared) */
+  .frame:not(.m)[data-desk="14"] .d-search:not(.is-empty) .res { animation: s14-fade .3s var(--ease-out); }
+  @keyframes s14-fade { from { opacity: 0; } }
+  /* while search is open the menu takes no hover */
+  .frame:not(.m)[data-desk="14"] .hdr.is-search :is(.d-mega, .d-mtxt) { pointer-events: none; }
+  /* a preview state picked from the toolbar (or auto-shown while editing) lands without playing the motion */
+  .frame.is-instant :is(.d-mega, .d-mega *, .d-search, .d-search *, .d-mtxt > span) { transition: none !important; animation: none !important; }
+  @media (prefers-reduced-motion: reduce) {
+    .frame:not(.m)[data-desk="14"] :is(.d-mega, .d-mega *, .d-search, .d-search *, .d-mtxt > span) { transition-duration: 0s !important; transition-delay: 0s !important; animation: none !important; }
+  }
   .frame:not(.m)[data-desk="14"] .d-search .res { margin-top: 28px; }
 
   /* ── mobile O · P · Q · R · S (Set 12 · 13 · 14) ── */
@@ -1739,8 +1768,11 @@
             <button type="button" class="hdr-item d-close" data-close><svg class="x-ico" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="m4 4 8 8M12 4l-8 8"/></svg><span>Close</span></button>
           </div>
           <div class="d-mega" aria-label="메뉴">
-            <nav class="mg-1"><a data-mg>Shop</a><a>About</a><a>Journal</a><a>Info</a><a>The Story</a></nav>
-            <nav class="mg-2"><a>New Arrivals</a><a>Essentials</a><a>Classics</a><a>Jackets</a><a>Tops</a><a>Skirts</a><a>Dresses</a><a>Accessories</a></nav>
+            <nav class="mg-1"><a data-mg="shop">Shop</a><a data-mg="about">About</a><a>Journal</a><a>Info</a><a>The Story</a></nav>
+            <div class="mg-2s">
+              <nav class="mg-2" data-for="shop"><a>New Arrivals</a><a>Essentials</a><a>Classics</a><a>Jackets</a><a>Tops</a><a>Skirts</a><a>Dresses</a><a>Accessories</a></nav>
+              <nav class="mg-2" data-for="about"><a>Brand</a><a>Stores</a></nav>
+            </div>
           </div>
           <div class="d-dim" data-dclose></div>
           <aside class="d-drawer" aria-label="메뉴">
@@ -2531,7 +2563,13 @@ function createDesktop() {
     hdr.classList.toggle('is-search', local.search);
     hdr.querySelector('.d-drawer').dataset.depth = local.dwDepth;
     hdr.querySelector('.dw-big').dataset.depth = local.dwDepth;
-    hdr.querySelector('.d-mega').classList.toggle('is-sub', local.sub);
+    hdr.querySelector('.d-mega').classList.toggle('is-sub', !!local.sub);
+    hdr.querySelectorAll('.mg-1 > a').forEach(a => a.classList.toggle('is-cur', !!local.sub && a.dataset.mg === local.sub));
+    hdr.querySelectorAll('.mg-2').forEach(n => {
+      const on = n.dataset.for === local.sub;
+      n.classList.toggle('is-on', on);
+      if (on) { const it = hdr.querySelector(`.mg-1 > [data-mg="${local.sub}"]`); n.style.setProperty('--top', (it.offsetTop - it.parentNode.offsetTop) + 'px'); } // level with the hovered item
+    });
     // Set 05 / 06 also dims the page under its search panel
     frame.classList.toggle('is-dimmed', (local.open && !local.search && !['02', '03', '10'].includes(state.desk)) || (local.search && !['01', '02'].includes(state.desk)));
     // Set 11 · 12 · 13's drawers open over the header, which stays as it was under the dim
@@ -2564,8 +2602,10 @@ function createDesktop() {
   hdr.querySelector('[data-dwb-to1]').addEventListener('click', () => { local.dwDepth = 1; render(); });
   // Set 14: MENU ↔ CLOSE; hovering Shop shows its 2depth column, another 1depth item hides it
   hdr.querySelector('[data-mtoggle]').addEventListener('click', () => { clearForced(); openMenu(!local.open); });
+  // Set 14: hovering Shop · About shows its depth 2 column, another depth 1 item hides it; no hover while search is open
   hdr.querySelectorAll('.mg-1 > a').forEach(a => a.addEventListener('mouseenter', () => {
-    const sub = a.hasAttribute('data-mg'); if (sub !== local.sub) { local.sub = sub; render(); }
+    if (local.search) return;
+    const sub = a.dataset.mg || false; if (sub !== local.sub) { local.sub = sub; render(); }
   }));
 
   function setSearch(open) {
@@ -2598,7 +2638,10 @@ function createDesktop() {
       shop.querySelector('.dd').classList.toggle('show-hover', view === 'menu' && !!opts.hover);
       if (view === 'search') { local.search = true; local.caret = !opts.empty; }
       input.value = view === 'search' && !opts.empty ? 'Product' : '';
+      frame.classList.add('is-instant');
       render();
+      void frame.offsetHeight; // commit the end state before the motion comes back
+      frame.classList.remove('is-instant');
     },
   };
 }
