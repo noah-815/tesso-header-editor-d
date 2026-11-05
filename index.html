@@ -1211,6 +1211,13 @@
   .frame[data-desk="09"]:not(.is-overlap) .hdr { margin-bottom: var(--float); } /* sub pages: a gap under the card */
   /* inset card: the open menu · search panel tucks 1px under the bar, so scaled previews show no hairline seam between them */
   .frame:not(.m):is([data-desk="08"], [data-desk="09"]) :is(.dd, .d-search) { margin-top: -1px; border-top: 1px solid transparent; }
+  /* the same seam where a panel opens flush under a full-width bar: a 1px band of the panel colour covers it, layout untouched */
+  .frame:not(.m):is([data-desk="01"], [data-desk="02"], [data-desk="05"], [data-desk="07"], [data-desk="14"]) .dd,
+  .frame:not(.m):is([data-desk="01"], [data-desk="05"], [data-desk="07"], [data-desk="14"]) .d-search,
+  .frame.m:not([data-pair="N"], [data-pair="E"]) .m-panel { box-shadow: 0 -1px 0 var(--header-background); }
+  .frame.m[data-pair="I"] .m-panel:not(.is-search-mode) { box-shadow: none; } /* drawer from the side, not under the bar */
+  .frame:not(.m)[data-desk="03"] .dd { box-shadow: 0 -1px 0 var(--header-background); }
+  .frame:not(.m)[data-desk="03"] .d-search { box-shadow: inset 0 1px 0 color-mix(in srgb, var(--header-nav) 8%, transparent), 0 -1px 0 var(--header-background); }
   .frame:not(.m)[data-desk="09"] .d-search .res { margin-top: 32px; }
   .frame:not(.m)[data-desk="09"] .d-list { font-size: 14px; }
   .frame:not(.m)[data-desk="09"] .d-list li { padding: 8px 0; }
