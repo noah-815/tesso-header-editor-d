@@ -992,6 +992,7 @@
   .frame.m[data-pair="N"] .m-left, .frame.m[data-pair="N"] .m-right > :not(.only-n) { display: none !important; }
   .frame.m[data-pair="N"] .m-right { gap: 2px; height: auto; align-self: flex-end; align-items: center; }
   .frame.m[data-pair="N"] .m-panel > * { flex: none; }
+  /* mobileN: touch screens have no hover, so chips and list rows keep their colours under the pointer */
   .frame.m[data-pair="N"] .m-right > .only-n {
     display: flex; align-items: center; justify-content: center; min-width: 32px; width: auto; height: 32px; padding: 0 10px; border-radius: 2px;
     background: var(--s10-c-bg); color: var(--s10-c-nav); font: 400 12px/1 Inter, Pretendard, sans-serif; text-transform: uppercase;
@@ -1001,7 +1002,6 @@
   .frame.m[data-pair="N"] .m-right svg { width: 16px; height: 16px; }
   .frame.m[data-pair="N"] .m-right > :is(.n-x, .n-close) { background: var(--s10-c-bga); color: var(--s10-c-act); }
   .frame.m[data-pair="N"] .m-right > .n-close { height: 33px; font-size: 13px; }
-  .frame.m[data-pair="N"] .m-right > .only-n:hover { background: var(--s10-c-bga); color: var(--s10-c-act); } /* utility hover = the selected chip */
   .frame.m[data-pair="N"] .hdr:not(.is-menu) .m-right > :is(.n-x, .n-close),
   .frame.m[data-pair="N"] .hdr.is-menu:not(.is-search) .m-right > :is(.n-x, .n-menu),
   .frame.m[data-pair="N"] .hdr.is-search .m-right > :is(.n-search, .n-close) { display: none; }
@@ -1019,7 +1019,6 @@
   .frame.m[data-pair="N"] .acc-ico { display: flex; color: inherit; }
   .frame.m[data-pair="N"] .acc-ico svg { width: 20px; height: 20px; }
   .frame.m[data-pair="N"] .acc.is-open { border-radius: 2px; background: var(--s10-c-bga); color: var(--s10-c-act); }
-  .frame.m[data-pair="N"] .m-list.not-a > :is(a.m-item, .acc:not(.is-open) > .m-item):hover { background: var(--s10-c-bga); color: var(--s10-c-act); }
   .frame.m[data-pair="N"] .m-list.not-a > .acc.is-open > .m-item { padding-top: 4px; background: none; color: inherit; } /* outranks the chip rule above */
   .frame.m[data-pair="N"] .acc-sub { padding: 4px 12px 12px; }
   .frame.m[data-pair="N"] .acc-sub .m-item { height: 32px; padding: 0; border: 0; font: 400 12px/1 Inter, Pretendard, sans-serif; text-transform: uppercase; color: inherit; }
