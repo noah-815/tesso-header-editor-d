@@ -2361,9 +2361,8 @@ const overlaps = () => canOverlap() && state.overlap[state.page];
 
 // starting colours: the Base scheme of the earlier editors
 const DEFAULT_COLORS = {
-  // Set 10 (Figma 7777:208104): the 미디어 위 tokens are separate but start with the same values as the header's own —
-  // dark chips, white text, a white selected chip — over the hero, once scrolled and on sub pages alike
-  s10MediaBg: '#111111', s10MediaNav: '#ffffff', s10MediaBgActive: '#ffffff', s10MediaActive: '#111111',
+  // Set 10 (Figma 7328:62302): light chips over the hero, dark chips once scrolled / on sub pages
+  s10MediaBg: '#f9f9f9', s10MediaNav: '#000000', s10MediaBgActive: '#2a2a2a', s10MediaActive: '#ffffff',
   s10MediaLightBg: '#111111', s10MediaLightNav: '#ffffff', s10MediaLightBgActive: '#ffffff', s10MediaLightActive: '#111111', // like the sub pages
   s10Bg: '#111111', s10Nav: '#ffffff', s10BgActive: '#ffffff', s10Active: '#111111',
   mediaDarkBackground: '#ffffff00', mediaDarkNav: '#ffffff', mediaLightBackground: '#ffffff00', mediaLightNav: '#1a1a1a',
