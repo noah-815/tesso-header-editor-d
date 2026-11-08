@@ -2129,7 +2129,8 @@ const ITEMS = [
   ITEM_OPTS_BY.menuNav = { ...ITEM_OPTS_BY.menuNav, '07': { hover: true } };
   ITEMS.find(i => i.key === 'backdrop').screensBy['07'] = ['menu', 'search'];
 }
-// Set 04 + E: Figma "tokens by screen" (헤더 겹침 colours split by tone like the rest of the editor)
+// Set 04 + E: Figma "유저 컬러 편집 항목 · Set 04 페어링 (칩 중심 구성안)" 7777:205167 — 헤더 겹침 colours split by tone
+// like the rest of the editor; the open menu and search keep the collapsed colours
 {
   const B = { '04E': 'both' }, M = { '04E': 'm' };
   const S04 = { mediaDarkNav: B, mediaLightNav: B, nav: B, menuNav: B, menuBack: M, menuUtility: M, backdrop: { '04E': 'pc' },
@@ -2159,10 +2160,11 @@ const codes = str => Object.fromEntries([...str.replace(/\s/g, '')].map((ch, i) 
 const ON = {
   media:      codes('--- - - b bbbb - b b b bb bb bb b'),
   mediaPoint: codes('--- - - b ---- - - - b -- -- -- -'),
+  mediaFg2:   codes('--- - - m ---- - - - - -- -- -- -'),
   mediaBadge: codes('--- - - b -mmm - m b - bb bb bb m'),
   bg:         codes('bbb b b b bbbb b b b b bb bb bb b'),
   fg2:        codes('bbb m m m mmmm m m m - bb bb bb b'),
-  field:      codes('--- b - b ---- - - - - -- -- -- -'),
+  field:      codes('--- b - - ---- - - - - -- -- -- -'),
   point:      codes('--- - - b ---- - - - b -- -- -- -'),
   border:     codes('m-- - b - bbbb b b - - bb bb bb b'),
   badge:      codes('-mm b b b -mmm m m b - bb bb bb m'),
@@ -2174,7 +2176,7 @@ const INC_FG = {
   '01': '상단 메뉴·아이콘, 메뉴 텍스트, 펼치기 아이콘 (+ / −), 입력한 검색어, 검색창 아이콘, 검색 결과 텍스트, 전체보기 버튼, 상품명, 판매가',
   '02': '상단 메뉴·아이콘, 메뉴 텍스트',
   '03': '상단 메뉴·아이콘, 메뉴 텍스트, 펼치기 아이콘 (+ / −), 입력한 검색어, 검색 결과 텍스트',
-  '04': '칩 텍스트·아이콘, 메뉴 텍스트, 검색창 아이콘, 입력한 검색어',
+  '04': '칩 텍스트·아이콘, 메뉴 텍스트, 입력한 검색어',
   '08': '상단 메뉴·아이콘, 메뉴 텍스트, 입력한 검색어, 검색 결과 텍스트',
   '09': '상단 메뉴·아이콘, 메뉴 텍스트, 입력한 검색어, 검색창 아이콘, 검색 결과 텍스트',
   '10': '메뉴·아이콘 텍스트',
@@ -2190,11 +2192,13 @@ const ROLES = [
     const m = (key, token, label, on, view, to) => ({ key: `rMedia${T}${key}`, tone, token: `header-on-media/${tone}/${token}`, label, on, view, opts, to });
     return [
       m('Bg', 'background', '배경', ON.media, 'default', { '*': [`media${T}Background`], '04': [`media${T}NavBg`], '10': [`${S}Bg`] }),
-      m('Fg', 'foreground', '텍스트·아이콘', ON.media, 'default', { '*': [`media${T}Nav`], '10': [`${S}Nav`] }),
+      // Set 04: the open menu keeps the collapsed 미디어 위 colours, so 메뉴 텍스트 is 텍스트·아이콘
+      m('Fg', 'foreground', '텍스트·아이콘', ON.media, 'default', { '*': [`media${T}Nav`], '04': [`media${T}Nav`, `media${T}MenuNav`], '10': [`${S}Nav`] }),
       m('BadgeBg', 'badge-cart-background', '장바구니 뱃지 배경', ON.mediaBadge, 'default', { '*': [`media${T}BadgeBackground`] }),
       m('BadgeLabel', 'badge-cart-label', '장바구니 뱃지 숫자', ON.mediaBadge, 'default', { '*': [`media${T}BadgeLabel`] }),
       m('Point', 'background-active', '활성 배경', ON.mediaPoint, 'menu', { '04': [`media${T}NavBgActive`], '10': [`${S}BgActive`] }),
       m('PointText', 'foreground-active', '활성 텍스트', ON.mediaPoint, 'menu', { '04': [`media${T}NavActive`], '10': [`${S}Active`] }),
+      { ...m('Fg2', 'foreground-secondary', '보조 텍스트', ON.mediaFg2, 'menu', { '04': [`media${T}MenuBack`, `media${T}MenuUtility`] }), inc: { '04': '유틸리티, 뒤로가기 버튼' } },
     ];
   }),
 
@@ -2206,19 +2210,19 @@ const ROLES = [
     // 검색창 아이콘 has its own item wherever the search field shows one (Set 03 · 08 · 10 have none);
     // Set 02's search sits on its own 검색창 배경, so 입력한 검색어 is its own item there too
     to: { '*': FG.filter(k => k !== 'searchIcon'), '02': FG.filter(k => !['input', 'searchIcon'].includes(k)), '03': FG, '08': FG,
-      '04': [...FG.filter(k => k !== 'searchIcon'), 'mediaDarkMenuNav', 'mediaLightMenuNav'], '10': ['s10Nav'] }, inc: INC_FG },
+      '10': ['s10Nav'] }, inc: INC_FG },
   { key: 'badgeBg', token: 'header/badge-cart-background', label: '장바구니 뱃지 배경', on: ON.badge, view: 'default', opts: { solid: true }, to: { '*': ['badgeBackground'] } },
   { key: 'badgeFg', token: 'header/badge-cart-label', label: '장바구니 뱃지 숫자', on: ON.badge, view: 'default', opts: { solid: true }, to: { '*': ['badgeLabel'] } },
   { key: 'fg2', token: 'header/foreground-secondary', label: '보조 텍스트', on: ON.fg2, view: 'menu',
     to: { '*': ['menuUtility', 'menuBack'], // 원가 is 텍스트·아이콘 faded (tokenVars)
-      '04': ['menuUtility', 'menuBack', 'mediaDarkMenuBack', 'mediaLightMenuBack', 'mediaDarkMenuUtility', 'mediaLightMenuUtility'] },
+      '04': ['menuUtility', 'menuBack'] },
     inc: { '*': '뒤로가기 버튼, 유틸리티 (로그인·마이페이지)', '01': '뒤로가기 버튼, 유틸리티 (로그인·마이페이지)',
       '02': '유틸리티 (로그인·마이페이지)', '03': '유틸리티 (로그인·마이페이지)', '07': '유틸리티 (로그인·마이페이지)', '09': '유틸리티 (로그인·마이페이지)',
       '04': '뒤로가기 버튼, 유틸리티', '11': '유틸리티 (로그인·마이페이지)', '12': '유틸리티 (로그인·마이페이지)',
       '13': '유틸리티 (로그인·마이페이지), 뒤로 가기 (< Shop)', '14': '유틸리티 (로그인·마이페이지), 뒤로가기 버튼' } },
   { key: 'field', token: 'header/field', label: '검색창 배경', on: ON.field, view: 'search', opts: { empty: true }, to: { '*': ['searchFieldBg'] } },
   { key: 'fieldInput', token: 'header-search/input-text', label: '입력한 검색어', on: { '02C': 'both' }, view: 'search', to: { '*': ['input'] } },
-  { key: 'fieldIcon', token: 'header-search/icon', label: '검색창 아이콘', on: Object.fromEntries(Object.entries(ON.bg).filter(([k]) => !['03D', '08L', '10N'].includes(k))),
+  { key: 'fieldIcon', token: 'header-search/icon', label: '검색창 아이콘', on: Object.fromEntries(Object.entries(ON.bg).filter(([k]) => !['03D', '04E', '08L', '10N'].includes(k))),
     view: 'search', opts: { empty: true }, to: { '*': ['searchIcon'] } },
   { key: 'point', token: 'header/background-active', label: '활성 배경', on: ON.point, view: 'menu', opts: { solid: true },
     to: { '04': ['navBgActive'], '10': ['s10BgActive'] }, inc: { '04': '선택된 칩 배경', '10': '선택된 칩 배경 · 전체보기 버튼' } },
@@ -2270,6 +2274,7 @@ const CONTRAST = [
     { fg: `rMedia${T}BadgeLabel`, bg: `rMedia${T}BadgeBg`, min: 2 },
     { fg: `rMedia${T}BadgeBg`, bg: `rMedia${T}Bg`, min: 1.2, kind: 'shape' },
     { fg: `rMedia${T}PointText`, bg: `rMedia${T}Point`, min: 2 },
+    { fg: `rMedia${T}Fg2`, bg: `rMedia${T}Bg`, min: 2 },
   ]),
 ];
 // what each surface is painted over: the page (white), the hero image, or another surface
