@@ -1322,6 +1322,10 @@
     background: var(--s4-bg); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); transition: background-color .25s ease;
   }
   .frame:not(.m)[data-desk="04"] .d-ico svg { width: 26px; height: 26px; }
+  /* Set 04 + E: cart badge on the bag circle's top-right edge (임시 — not in the Figma frames yet) */
+  .frame[data-desk="04"] .badge { display: flex; }
+  .frame:not(.m)[data-desk="04"] .d-ico .badge { top: 3px; left: auto; right: 3px; margin: 0; min-width: 16px; height: 16px; border-radius: 8px; font-size: 10px; }
+  .frame.m[data-desk="04"] .mb-bag .badge { top: -2px; left: auto; right: -2px; margin: 0; }
   .frame:not(.m)[data-desk="04"] .dim { top: 0; }
   /* set04_expanded: a rounded card under the menu pill, as wide as it */
   .frame:not(.m)[data-desk="04"] .dd {
