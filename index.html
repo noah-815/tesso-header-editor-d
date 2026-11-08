@@ -2183,7 +2183,7 @@ const INC_FG = {
   '04': '칩 텍스트·아이콘, 메뉴 텍스트, 입력한 검색어',
   '08': '상단 메뉴·아이콘, 메뉴 텍스트, 입력한 검색어, 검색 결과 텍스트',
   '09': '상단 메뉴·아이콘, 메뉴 텍스트, 입력한 검색어, 검색창 아이콘, 검색 결과 텍스트',
-  '10': '메뉴·아이콘 텍스트',
+  '10': '메뉴·아이콘 텍스트, 입력한 검색어, 검색 결과 텍스트',
   '12': '상단 메뉴·아이콘, 메뉴 텍스트, 펼치기 아이콘 (+ / −), 입력한 검색어, 검색창 아이콘, 전체보기 버튼, 상품명, 판매가',
   '13': '상단 메뉴·아이콘, 메뉴 텍스트, 입력한 검색어, 검색창 아이콘, 검색 결과 텍스트',
   '14': '상단 메뉴·아이콘, 메뉴 텍스트, 입력한 검색어, 검색창 아이콘, 전체보기 버튼, 상품명, 판매가',
@@ -2209,7 +2209,7 @@ const ROLES = [
   { group: '헤더', desc: '헤더 바, 펼친 메뉴, 검색 화면에 적용돼요.' },
   { key: 'bg', token: 'header/background', label: '배경', on: ON.bg, view: 'default', opts: { solid: true },
     to: { '*': ['background'], '04': ['navBg'], '10': ['s10Bg'] },
-    inc: { '*': '배경색', '04': '칩 배경', '10': '메뉴·아이콘·검색 칩 배경' } },
+    inc: { '*': '배경색', '04': '칩 배경', '10': '메뉴·아이콘 칩, 검색창, 검색 결과 배경' } },
   { key: 'fg', token: 'header/foreground', label: '텍스트·아이콘', on: ON.bg, view: 'default', opts: { solid: true },
     // 검색창 아이콘 has its own item wherever the search field shows one (Set 03 · 08 · 10 have none);
     // Set 02's search sits on its own 검색창 배경, so 입력한 검색어 is its own item there too
@@ -2231,7 +2231,7 @@ const ROLES = [
   { key: 'point', token: 'header/background-active', label: '활성 배경', on: ON.point, view: 'menu', opts: { solid: true },
     to: { '04': ['navBgActive'], '10': ['s10BgActive'] }, inc: { '04': '선택된 칩 배경', '10': '선택된 칩 배경 · 전체보기 버튼' } },
   { key: 'pointText', token: 'header/foreground-active', label: '활성 텍스트', on: ON.point, view: 'menu', opts: { solid: true },
-    to: { '04': ['navActive'], '10': ['s10Active'] }, inc: { '04': '선택된 칩 텍스트', '10': '선택 칩 · 검색 결과 텍스트' } },
+    to: { '04': ['navActive'], '10': ['s10Active'] }, inc: { '04': '선택된 칩 텍스트', '10': '선택된 칩 텍스트 · 전체보기 버튼' } },
   { key: 'line', token: 'header/border', label: '구분선', on: ON.border,
     // 구분선 only in the search (검색창 선): named 검색창 구분선
     labelBy: { '*': '검색창 구분선', '03': '구분선', '07': '구분선', '12': '구분선' }, view: 'search', viewBy: { '03': 'default', '07': 'default' },
@@ -2361,8 +2361,9 @@ const overlaps = () => canOverlap() && state.overlap[state.page];
 
 // starting colours: the Base scheme of the earlier editors
 const DEFAULT_COLORS = {
-  // Set 10 (Figma 7328:62302): light chips over the hero, dark chips once scrolled / on sub pages
-  s10MediaBg: '#f9f9f9', s10MediaNav: '#000000', s10MediaBgActive: '#2a2a2a', s10MediaActive: '#ffffff',
+  // Set 10 (Figma 7777:208104): the 미디어 위 tokens are separate but start with the same values as the header's own —
+  // dark chips, white text, a white selected chip — over the hero, once scrolled and on sub pages alike
+  s10MediaBg: '#111111', s10MediaNav: '#ffffff', s10MediaBgActive: '#ffffff', s10MediaActive: '#111111',
   s10MediaLightBg: '#111111', s10MediaLightNav: '#ffffff', s10MediaLightBgActive: '#ffffff', s10MediaLightActive: '#111111', // like the sub pages
   s10Bg: '#111111', s10Nav: '#ffffff', s10BgActive: '#ffffff', s10Active: '#111111',
   mediaDarkBackground: '#ffffff00', mediaDarkNav: '#ffffff', mediaLightBackground: '#ffffff00', mediaLightNav: '#1a1a1a',
