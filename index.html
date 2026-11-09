@@ -2622,8 +2622,8 @@ function createDesktop() {
     // Set 14 over the media: header and sheet are one piece, also while it closes (400ms)
     hdr.classList.toggle('is-sheet', state.desk === '14' && overlaps() && !local.solid && (local.open || local.search || local.leaving));
     // Set 04 · 10 · 11 – 14 keep their 미디어 위 colours while hovered and after scrolling;
-    // Set 05 / 06 · 08 · 09 keep them while hovered at the top, and change once scrolled
-    const hovered = local.hover && !KEEP_MEDIA.includes(state.desk) && !['05', '08', '09'].includes(state.desk);
+    // the others (05 / 06 · 08 · 09) switch to the header colours as soon as the bar is hovered, as in Figma
+    const hovered = local.hover && !KEEP_MEDIA.includes(state.desk);
     const scrolled = local.scrolled && !KEEP_MEDIA.includes(state.desk);
     hdr.classList.toggle('on-media', overlaps() && !scrolled && !hovered && !local.solid && !drawn);
     p.paintSearch(local.caret);
