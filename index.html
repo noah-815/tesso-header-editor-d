@@ -915,8 +915,8 @@
   /* Set 04 · 10: the chips, cards and fields carry the 배경 블러 — the header's own, or 헤더 겹침's while over the media */
   .frame:is([data-desk="04"], [data-desk="10"]) { --chip-blur: var(--header-blur, 0px); }
   .frame:is([data-desk="04"], [data-desk="10"]):has(.hdr.on-media) { --chip-blur: var(--header-on-media-blur, 0px); }
-  .frame[data-desk="10"] .hdr { --s10-c-bg: var(--s10-bg); --s10-c-nav: var(--s10-nav); --s10-c-bga: var(--s10-bga); --s10-c-act: var(--s10-act); }
-  .frame[data-desk="10"] .hdr.on-media { --s10-c-bg: var(--s10m-bg); --s10-c-nav: var(--s10m-nav); --s10-c-bga: var(--s10m-bga); --s10-c-act: var(--s10m-act); }
+  .frame[data-desk="10"] .hdr { --s10-c-bg: var(--s10-bg); --s10-c-nav: var(--s10-nav); --s10-c-bga: var(--s10-bga); --s10-c-act: var(--s10-act); --s10-c-hover: var(--s10-hover); }
+  .frame[data-desk="10"] .hdr.on-media { --s10-c-bg: var(--s10m-bg); --s10-c-nav: var(--s10m-nav); --s10-c-bga: var(--s10m-bga); --s10-c-act: var(--s10m-act); --s10-c-hover: var(--s10m-hover); }
   .frame[data-desk="10"] .hdr .hdr-bar, .frame[data-desk="10"] .hdr.on-media .hdr-bar { background: transparent; color: var(--s10-c-nav); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
   /* set10_header: 74px, 20px sides; the menu, icons and bag count are 32px chips, 2px apart */
   .frame:not(.m)[data-desk="10"] { --hdr-h: 74px; --pad-x: 20px; }
@@ -945,14 +945,14 @@
   .frame:not(.m)[data-desk="10"] .hdr.is-open .hdr-item[data-dd] { background: var(--s10-c-bga); color: var(--s10-c-act); }
   .frame:not(.m)[data-desk="10"] .d-nav > .hdr-item:hover { background: var(--s10-c-bga); color: var(--s10-c-act); } /* 1depth hover = the selected chip */
   .frame:not(.m)[data-desk="10"] .d-util > :is(.hdr-item, .d-ico, .d-cnt):hover { background: var(--s10-c-bga); color: var(--s10-c-act); } /* utility hover = the selected chip */
-  /* set10_2depth: a column of chips 2px under Shop; hover lays 2% of the text colour over the chip */
+  /* set10_2depth: a column of chips 2px under Shop; hover = Set 02's rule: the chip tinted toward its text colour (hoverTint) */
   .frame:not(.m)[data-desk="10"] .dd { top: calc(100% + 2px); min-width: 0; padding: 0; gap: 2px; background: none; color: var(--s10-c-nav); }
   .frame:not(.m)[data-desk="10"] .dd a {
-    display: flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 2px; background-color: var(--s10-c-bg); color: inherit;
+    display: flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 2px; background-color: var(--s10-c-bg); color: inherit; transition: background-color .15s ease;
     font: 400 12px/1 Inter, Pretendard, sans-serif; text-transform: uppercase; -webkit-backdrop-filter: blur(var(--chip-blur)); backdrop-filter: blur(var(--chip-blur));
   }
   .frame:not(.m)[data-desk="10"] .dd a:hover, .frame:not(.m)[data-desk="10"] .dd.show-hover a:nth-child(6) {
-    color: inherit; background-image: linear-gradient(color-mix(in srgb, var(--s10-c-nav) 2%, transparent), color-mix(in srgb, var(--s10-c-nav) 2%, transparent));
+    color: inherit; background-color: var(--s10-c-hover);
   }
   .frame:not(.m)[data-desk="10"] .dd.show-hover a:nth-child(4) { color: inherit; }
   /* set10_searchBar + set10_search: a 425px stack of chips under the menu, the page dimmed behind */
@@ -2455,7 +2455,13 @@ function tokenVars() {
   vars['--header-menu-on-media-back'] = c[`media${t}MenuBack`];
   vars['--header-menu-on-media-utility'] = c[`media${t}MenuUtility`];
   // Set 10's 미디어 위 chips: the dark-media set (light chips) or the light-media set (dark chips)
-  for (const k of ['bg', 'nav', 'bga', 'act']) vars[`--s10m-${k}`] = vars[`--s10m${t === 'Light' ? 'l' : 'd'}-${k}`];
+  // Set 10 2depth hover: same rule as Set 02 — the chip colour tinted toward its text colour
+  if (state.desk === '10') Object.assign(vars, {
+    '--s10-hover': hoverTint(c.s10Bg, c.s10Nav),
+    '--s10md-hover': hoverTint(c.s10MediaBg, c.s10MediaNav),
+    '--s10ml-hover': hoverTint(c.s10MediaLightBg, c.s10MediaLightNav),
+  });
+  for (const k of ['bg', 'nav', 'bga', 'act', 'hover']) vars[`--s10m-${k}`] = vars[`--s10m${t === 'Light' ? 'l' : 'd'}-${k}`];
   // Set 05 / 06 · 08 · 09 don't edit these: they follow the colour next to them
   if (state.desk !== '01') Object.assign(vars, {
     '--header-search-border-active': c.borderInactive, '--header-menu-nav-hover': c.menuNav,
